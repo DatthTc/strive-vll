@@ -1,34 +1,12 @@
 const Product = require("../../models/product-model.js");
+const filterStatusHelpers = require("../../helpers/filterStatus.helper");
+const searchHelpers = require("../../helpers/searchProduct");
+
 //[GET] /admin/products
 module.exports.product = async (req, res) => {
-  // lọc và tìm kiếm
-  let filterStatus = [
-    {
-      name: "Tất Cả",
-      status: "",
-      class: "",
-    },
-    {
-      name: "Hoạt Động",
-      status: "active",
-      class: "",
-    },
-    {
-      name: "Dừng Hoạt Động",
-      status: "inactive",
-      class: "",
-    },
-  ];
+  // là hàm filterStatus chứa một chức năng từ helpers được truyền từ filterStatusHelpers
+  const filterStatus = filterStatusHelpers(req.query);
 
-  if (req.query.status) {
-    const index = filterStatus.findIndex(
-      (item) => item.status == req.query.status
-    );
-    filterStatus[index].class = "active";
-  } else {
-    const index = filterStatus.findIndex((item) => item.status == "");
-    filterStatus[index].class = "active";
-  }
   let find = {
     deleted: false,
   };
@@ -37,6 +15,11 @@ module.exports.product = async (req, res) => {
     find.status = req.query.status;
   }
 
+  // chức năng function of search
+  const objectSearh = searchHelpers(req.query);
+  if (objectSearh.keyword) {
+    find.title = objectSearh.regex;
+  }
   const products = await Product.find(find);
 
   res.render("admin/pages/product/index.pug", {
@@ -44,5 +27,6 @@ module.exports.product = async (req, res) => {
     //truyen` data ra ngoai giao dien
     products: products,
     filterStatus: filterStatus,
+    keyword: objectSearh.keyword,
   });
 };
