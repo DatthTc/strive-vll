@@ -3,9 +3,19 @@ extends ../../layouts/default.pug
 block main 
     h1 Danh Sách Sản Phẩm
 
+    .card.mb-3 
+        .card-header Bộ Lọc Và Tìm Kiếm
+        .card-body 
+            each item in filterStatus 
+                button(
+                    class=`btn btn-sm ml-1 btn-outline-success ${item.class}`
+                    button-status = item.status
+                ) #{item.name}
+
     table.table.table-hover.table-sm 
         thead 
-            tr STT 
+            tr  
+                th STT 
                 th Hình ảnh 
                 th Tiêu đề
                 th Giá
