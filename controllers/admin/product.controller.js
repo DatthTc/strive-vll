@@ -1,6 +1,7 @@
 const Product = require("../../models/product-model.js");
 const filterStatusHelpers = require("../../helpers/filterStatus.helper");
 const searchHelpers = require("../../helpers/searchProduct");
+const paginationHelper = require("../../helpers/pagination.helper");
 
 //[GET] /admin/products
 module.exports.product = async (req, res) => {
@@ -13,6 +14,7 @@ module.exports.product = async (req, res) => {
 
   if (req.query.status) {
     find.status = req.query.status;
+    pagination.helper;
   }
 
   // chức năng function of search
@@ -20,7 +22,25 @@ module.exports.product = async (req, res) => {
   if (objectSearh.keyword) {
     find.title = objectSearh.regex;
   }
-  const products = await Product.find(find);
+
+  // let objectPagination = {
+  //   currentPage: 1,
+  //   limitItem: 4,
+  // };
+  const countProducts = await Product.countDocuments(find); // count product
+  const objectPagination = paginationHelper(
+    {
+      // nhớ objectPagination là hàm tự định nghĩa
+      currentPage: 1,
+      limitItem: 4,
+    },
+    req.query,
+    countProducts
+  );
+
+  const products = await Product.find(find)
+    .limit(objectPagination.limitItem)
+    .skip(objectPagination.skip);
 
   res.render("admin/pages/product/index.pug", {
     pageTitle: "Danh Sách Sản Phẩm ",
@@ -28,5 +48,6 @@ module.exports.product = async (req, res) => {
     products: products,
     filterStatus: filterStatus,
     keyword: objectSearh.keyword,
+    pagination: objectPagination,
   });
 };
