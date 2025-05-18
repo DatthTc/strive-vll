@@ -11,7 +11,7 @@ const routerAdmin = require("./routers/admin/index.route"); // cấu hình route
 const app = express();
 const port = process.env.PORT; // lấy port từ file .env
 
-app.use(express.static("public"));
+app.use(express.static(`${__dirname}/public`));
 
 database.connect();
 
